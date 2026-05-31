@@ -16,8 +16,8 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", ex.getMessage()));
     }
 
-    @ExceptionHandler(NoAvailableQuotasException.class)
-    public ResponseEntity<Map<String, String>> handleNoQuotas(NoAvailableQuotasException ex) {
+    @ExceptionHandler(NoSlotsAvailableException.class)
+    public ResponseEntity<Map<String, String>> handleNoSlots(NoSlotsAvailableException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("error", ex.getMessage()));
     }

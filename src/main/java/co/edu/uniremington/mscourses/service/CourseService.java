@@ -1,7 +1,8 @@
 package co.edu.uniremington.mscourses.service;
 
+import co.edu.uniremington.mscourses.dto.CourseDto;
 import co.edu.uniremington.mscourses.exception.CourseNotFoundException;
-import co.edu.uniremington.mscourses.exception.NoAvailableQuotasException;
+import co.edu.uniremington.mscourses.exception.NoSlotsAvailableException;
 import co.edu.uniremington.mscourses.model.Course;
 import co.edu.uniremington.mscourses.repository.CourseRepository;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,8 @@ public class CourseService {
                 .orElseThrow(() -> new CourseNotFoundException(id));
     }
 
-    public Course save(Course course) {
+    public Course saveCourse(CourseDto dto) {
+        Course course = new Course(null, dto.getName(), dto.getCredits(), dto.getAvailableQuotas());
         return courseRepository.save(course);
     }
 
@@ -38,28 +40,28 @@ public class CourseService {
         }).orElseThrow(() -> new CourseNotFoundException(id));
     }
 
-    public void delete(Long id) {
+    public void deleteCourse(Long id) {
         if (!courseRepository.existsById(id)) {
             throw new CourseNotFoundException(id);
         }
         courseRepository.deleteById(id);
     }
 
-    public void decreaseQuota(Long id) {
-        Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new CourseNotFoundException(id));
+    public void reserveSlot(Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new CourseNotFoundException(courseId));
 
         if (course.getAvailableQuotas() <= 0) {
-            throw new NoAvailableQuotasException(id);
+            throw new NoSlotsAvailableException(courseId);
         }
 
         course.setAvailableQuotas(course.getAvailableQuotas() - 1);
         courseRepository.save(course);
     }
 
-    public void increaseQuota(Long id) {
-        Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new CourseNotFoundException(id));
+    public void releaseSlot(Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new CourseNotFoundException(courseId));
 
         course.setAvailableQuotas(course.getAvailableQuotas() + 1);
         courseRepository.save(course);

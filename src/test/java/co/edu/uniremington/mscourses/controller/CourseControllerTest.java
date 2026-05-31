@@ -1,8 +1,9 @@
 package co.edu.uniremington.mscourses.controller;
 
+import co.edu.uniremington.mscourses.dto.CourseDto;
 import co.edu.uniremington.mscourses.exception.CourseNotFoundException;
 import co.edu.uniremington.mscourses.exception.GlobalExceptionHandler;
-import co.edu.uniremington.mscourses.exception.NoAvailableQuotasException;
+import co.edu.uniremington.mscourses.exception.NoSlotsAvailableException;
 import co.edu.uniremington.mscourses.model.Course;
 import co.edu.uniremington.mscourses.service.CourseService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -85,13 +86,13 @@ class CourseControllerTest {
 
     @Test
     void create_ShouldReturn200WithCreatedCourse() throws Exception {
-        Course toCreate = new Course(null, "Física", 3, 20);
-        Course created  = new Course(1L,   "Física", 3, 20);
-        when(courseService.save(any(Course.class))).thenReturn(created);
+        CourseDto dto   = new CourseDto("Física", 3, 20);
+        Course created  = new Course(1L, "Física", 3, 20);
+        when(courseService.saveCourse(any(CourseDto.class))).thenReturn(created);
 
         mockMvc.perform(post("/api/courses")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(toCreate)))
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Física"));
     }
@@ -125,7 +126,7 @@ class CourseControllerTest {
 
     @Test
     void delete_WhenCourseExists_ShouldReturn200() throws Exception {
-        doNothing().when(courseService).delete(1L);
+        doNothing().when(courseService).deleteCourse(1L);
 
         mockMvc.perform(delete("/api/courses/1"))
                 .andExpect(status().isOk());
@@ -133,53 +134,53 @@ class CourseControllerTest {
 
     @Test
     void delete_WhenCourseNotFound_ShouldReturn404() throws Exception {
-        doThrow(new CourseNotFoundException(99L)).when(courseService).delete(99L);
+        doThrow(new CourseNotFoundException(99L)).when(courseService).deleteCourse(99L);
 
         mockMvc.perform(delete("/api/courses/99"))
                 .andExpect(status().isNotFound());
     }
 
-    // ── PUT /api/courses/{id}/decrease-quota ──────────────────────────────────
+    // ── PUT /api/courses/{id}/reserve-slot ────────────────────────────────────
 
     @Test
-    void decreaseQuota_WhenSuccess_ShouldReturn200() throws Exception {
-        doNothing().when(courseService).decreaseQuota(1L);
+    void reserveSlot_WhenSuccess_ShouldReturn200() throws Exception {
+        doNothing().when(courseService).reserveSlot(1L);
 
-        mockMvc.perform(put("/api/courses/1/decrease-quota"))
+        mockMvc.perform(put("/api/courses/1/reserve-slot"))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void decreaseQuota_WhenNoQuotas_ShouldReturn409() throws Exception {
-        doThrow(new NoAvailableQuotasException(1L)).when(courseService).decreaseQuota(1L);
+    void reserveSlot_WhenNoSlots_ShouldReturn409() throws Exception {
+        doThrow(new NoSlotsAvailableException(1L)).when(courseService).reserveSlot(1L);
 
-        mockMvc.perform(put("/api/courses/1/decrease-quota"))
+        mockMvc.perform(put("/api/courses/1/reserve-slot"))
                 .andExpect(status().isConflict());
     }
 
     @Test
-    void decreaseQuota_WhenCourseNotFound_ShouldReturn404() throws Exception {
-        doThrow(new CourseNotFoundException(99L)).when(courseService).decreaseQuota(99L);
+    void reserveSlot_WhenCourseNotFound_ShouldReturn404() throws Exception {
+        doThrow(new CourseNotFoundException(99L)).when(courseService).reserveSlot(99L);
 
-        mockMvc.perform(put("/api/courses/99/decrease-quota"))
+        mockMvc.perform(put("/api/courses/99/reserve-slot"))
                 .andExpect(status().isNotFound());
     }
 
-    // ── PUT /api/courses/{id}/increase-quota ──────────────────────────────────
+    // ── PUT /api/courses/{id}/release-slot ────────────────────────────────────
 
     @Test
-    void increaseQuota_WhenSuccess_ShouldReturn200() throws Exception {
-        doNothing().when(courseService).increaseQuota(1L);
+    void releaseSlot_WhenSuccess_ShouldReturn200() throws Exception {
+        doNothing().when(courseService).releaseSlot(1L);
 
-        mockMvc.perform(put("/api/courses/1/increase-quota"))
+        mockMvc.perform(put("/api/courses/1/release-slot"))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void increaseQuota_WhenCourseNotFound_ShouldReturn404() throws Exception {
-        doThrow(new CourseNotFoundException(99L)).when(courseService).increaseQuota(99L);
+    void releaseSlot_WhenCourseNotFound_ShouldReturn404() throws Exception {
+        doThrow(new CourseNotFoundException(99L)).when(courseService).releaseSlot(99L);
 
-        mockMvc.perform(put("/api/courses/99/increase-quota"))
+        mockMvc.perform(put("/api/courses/99/release-slot"))
                 .andExpect(status().isNotFound());
     }
 }

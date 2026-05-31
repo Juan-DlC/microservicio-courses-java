@@ -1,7 +1,8 @@
 package co.edu.uniremington.mscourses.service;
 
+import co.edu.uniremington.mscourses.dto.CourseDto;
 import co.edu.uniremington.mscourses.exception.CourseNotFoundException;
-import co.edu.uniremington.mscourses.exception.NoAvailableQuotasException;
+import co.edu.uniremington.mscourses.exception.NoSlotsAvailableException;
 import co.edu.uniremington.mscourses.model.Course;
 import co.edu.uniremington.mscourses.repository.CourseRepository;
 import org.junit.jupiter.api.Test;
@@ -65,15 +66,15 @@ class CourseServiceTest {
                 () -> courseService.getCourseById(99L));
     }
 
-    // ── save ─────────────────────────────────────────────────────────────────
+    // ── saveCourse ───────────────────────────────────────────────────────────
 
     @Test
-    void save_ShouldPersistAndReturnCourse() {
-        Course course = new Course(null, "Física", 3, 20);
-        Course saved  = new Course(1L,   "Física", 3, 20);
+    void saveCourse_ShouldPersistAndReturnCourse() {
+        CourseDto dto  = new CourseDto("Física", 3, 20);
+        Course saved   = new Course(1L, "Física", 3, 20);
         when(courseRepository.save(any(Course.class))).thenReturn(saved);
 
-        Course result = courseService.save(course);
+        Course result = courseService.saveCourse(dto);
 
         assertNotNull(result);
         assertEquals(1L, result.getId());
@@ -104,76 +105,76 @@ class CourseServiceTest {
                 () -> courseService.update(99L, new Course()));
     }
 
-    // ── delete ───────────────────────────────────────────────────────────────
+    // ── deleteCourse ─────────────────────────────────────────────────────────
 
     @Test
-    void delete_WhenCourseExists_ShouldCallDeleteById() {
+    void deleteCourse_WhenCourseExists_ShouldCallDeleteById() {
         when(courseRepository.existsById(1L)).thenReturn(true);
 
-        courseService.delete(1L);
+        courseService.deleteCourse(1L);
 
         verify(courseRepository, times(1)).deleteById(1L);
     }
 
     @Test
-    void delete_WhenCourseNotFound_ShouldThrowCourseNotFoundException() {
+    void deleteCourse_WhenCourseNotFound_ShouldThrowCourseNotFoundException() {
         when(courseRepository.existsById(99L)).thenReturn(false);
 
-        assertThrows(CourseNotFoundException.class, () -> courseService.delete(99L));
+        assertThrows(CourseNotFoundException.class, () -> courseService.deleteCourse(99L));
         verify(courseRepository, never()).deleteById(any());
     }
 
-    // ── decreaseQuota ─────────────────────────────────────────────────────────
+    // ── reserveSlot ───────────────────────────────────────────────────────────
 
     @Test
-    void decreaseQuota_WhenQuotasAvailable_ShouldDecrementByOne() {
+    void reserveSlot_WhenSlotsAvailable_ShouldDecrementByOne() {
         Course course = new Course(1L, "Cálculo", 4, 5);
         when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
         when(courseRepository.save(any(Course.class))).thenReturn(course);
 
-        courseService.decreaseQuota(1L);
+        courseService.reserveSlot(1L);
 
         assertEquals(4, course.getAvailableQuotas());
         verify(courseRepository, times(1)).save(course);
     }
 
     @Test
-    void decreaseQuota_WhenNoQuotasLeft_ShouldThrowNoAvailableQuotasException() {
+    void reserveSlot_WhenNoSlotsAvailable_ShouldThrowNoSlotsAvailableException() {
         Course course = new Course(1L, "Cálculo", 4, 0);
         when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
 
-        assertThrows(NoAvailableQuotasException.class,
-                () -> courseService.decreaseQuota(1L));
+        assertThrows(NoSlotsAvailableException.class,
+                () -> courseService.reserveSlot(1L));
         verify(courseRepository, never()).save(any());
     }
 
     @Test
-    void decreaseQuota_WhenCourseNotFound_ShouldThrowCourseNotFoundException() {
+    void reserveSlot_WhenCourseNotFound_ShouldThrowCourseNotFoundException() {
         when(courseRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(CourseNotFoundException.class,
-                () -> courseService.decreaseQuota(99L));
+                () -> courseService.reserveSlot(99L));
     }
 
-    // ── increaseQuota ─────────────────────────────────────────────────────────
+    // ── releaseSlot ───────────────────────────────────────────────────────────
 
     @Test
-    void increaseQuota_WhenCourseExists_ShouldIncrementByOne() {
+    void releaseSlot_WhenCourseExists_ShouldIncrementByOne() {
         Course course = new Course(1L, "Cálculo", 4, 4);
         when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
         when(courseRepository.save(any(Course.class))).thenReturn(course);
 
-        courseService.increaseQuota(1L);
+        courseService.releaseSlot(1L);
 
         assertEquals(5, course.getAvailableQuotas());
         verify(courseRepository, times(1)).save(course);
     }
 
     @Test
-    void increaseQuota_WhenCourseNotFound_ShouldThrowCourseNotFoundException() {
+    void releaseSlot_WhenCourseNotFound_ShouldThrowCourseNotFoundException() {
         when(courseRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(CourseNotFoundException.class,
-                () -> courseService.increaseQuota(99L));
+                () -> courseService.releaseSlot(99L));
     }
 }

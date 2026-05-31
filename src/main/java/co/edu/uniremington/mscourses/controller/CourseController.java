@@ -1,15 +1,16 @@
 package co.edu.uniremington.mscourses.controller;
 
+import co.edu.uniremington.mscourses.dto.CourseDto;
 import co.edu.uniremington.mscourses.model.Course;
 import co.edu.uniremington.mscourses.service.CourseService;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -34,8 +35,8 @@ public class CourseController {
     }
 
     @PostMapping
-    public Course create(@RequestBody Course course) {
-        return courseService.save(course);
+    public Course create(@RequestBody CourseDto dto) {
+        return courseService.saveCourse(dto);
     }
 
     @PutMapping("/{id}")
@@ -45,16 +46,16 @@ public class CourseController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        courseService.delete(id);
+        courseService.deleteCourse(id);
     }
 
-    @PutMapping("/{id}/decrease-quota")
-    public void decreaseQuota(@PathVariable Long id) {
-        courseService.decreaseQuota(id);
+    @PutMapping("/{id}/reserve-slot")
+    public void reserveSlot(@PathVariable Long id) {
+        courseService.reserveSlot(id);
     }
 
-    @PutMapping("/{id}/increase-quota")
-    public void increaseQuota(@PathVariable Long id) {
-        courseService.increaseQuota(id);
+    @PutMapping("/{id}/release-slot")
+    public void releaseSlot(@PathVariable Long id) {
+        courseService.releaseSlot(id);
     }
 }
