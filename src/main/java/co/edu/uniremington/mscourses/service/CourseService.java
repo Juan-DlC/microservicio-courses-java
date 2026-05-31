@@ -1,5 +1,7 @@
 package co.edu.uniremington.mscourses.service;
 
+import co.edu.uniremington.mscourses.exception.CourseNotFoundException;
+import co.edu.uniremington.mscourses.exception.NoAvailableQuotasException;
 import co.edu.uniremington.mscourses.model.Course;
 import co.edu.uniremington.mscourses.repository.CourseRepository;
 import org.springframework.stereotype.Service;
@@ -28,19 +30,22 @@ public class CourseService {
             existingCourse.setName(courseDetails.getName());
             existingCourse.setCredits(courseDetails.getCredits());
             return courseRepository.save(existingCourse);
-        }).orElseThrow(() -> new RuntimeException("Curso no encontrado con ID: " + id));
+        }).orElseThrow(() -> new CourseNotFoundException(id));
     }
 
     public void delete(Long id) {
+        if (!courseRepository.existsById(id)) {
+            throw new CourseNotFoundException(id);
+        }
         courseRepository.deleteById(id);
     }
 
     public void decreaseQuota(Long id) {
         Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Course not found with ID: " + id));
+                .orElseThrow(() -> new CourseNotFoundException(id));
 
         if (course.getAvailableQuotas() <= 0) {
-            throw new RuntimeException("No available quotas for this course");
+            throw new NoAvailableQuotasException(id);
         }
 
         course.setAvailableQuotas(course.getAvailableQuotas() - 1);
@@ -49,7 +54,7 @@ public class CourseService {
 
     public void increaseQuota(Long id) {
         Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Course not found with ID: " + id));
+                .orElseThrow(() -> new CourseNotFoundException(id));
 
         course.setAvailableQuotas(course.getAvailableQuotas() + 1);
         courseRepository.save(course);
