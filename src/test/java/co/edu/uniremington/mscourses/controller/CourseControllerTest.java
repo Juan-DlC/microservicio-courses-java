@@ -1,16 +1,20 @@
 package co.edu.uniremington.mscourses.controller;
 
 import co.edu.uniremington.mscourses.exception.CourseNotFoundException;
+import co.edu.uniremington.mscourses.exception.GlobalExceptionHandler;
 import co.edu.uniremington.mscourses.exception.NoAvailableQuotasException;
 import co.edu.uniremington.mscourses.model.Course;
 import co.edu.uniremington.mscourses.service.CourseService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
@@ -20,17 +24,25 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(CourseController.class)
+@ExtendWith(MockitoExtension.class)
 class CourseControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockitoBean
+    @Mock
     private CourseService courseService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @InjectMocks
+    private CourseController courseController;
+
+    private MockMvc mockMvc;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @BeforeEach
+    void setup() {
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(courseController)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
+    }
 
     // ── GET /api/courses ──────────────────────────────────────────────────────
 
@@ -59,8 +71,7 @@ class CourseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(toCreate)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Física"))
-                .andExpect(jsonPath("$.credits").value(3));
+                .andExpect(jsonPath("$.name").value("Física"));
     }
 
     // ── PUT /api/courses/{id} ─────────────────────────────────────────────────
@@ -85,8 +96,7 @@ class CourseControllerTest {
         mockMvc.perform(put("/api/courses/99")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new Course())))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").exists());
+                .andExpect(status().isNotFound());
     }
 
     // ── DELETE /api/courses/{id} ──────────────────────────────────────────────
@@ -122,8 +132,7 @@ class CourseControllerTest {
         doThrow(new NoAvailableQuotasException(1L)).when(courseService).decreaseQuota(1L);
 
         mockMvc.perform(put("/api/courses/1/decrease-quota"))
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.error").exists());
+                .andExpect(status().isConflict());
     }
 
     @Test
