@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CourseService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-courses</a> &gt; <a href="index.source.html" class="el_package">co.edu.uniremington.mscourses.service</a> &gt; <span class="el_source">CourseService.java</span></div><h1>CourseService.java</h1><pre class="source lang-java linenums">package co.edu.uniremington.mscourses.service;
 
+import co.edu.uniremington.mscourses.dto.CourseDto;
 import co.edu.uniremington.mscourses.exception.CourseNotFoundException;
-import co.edu.uniremington.mscourses.exception.NoAvailableQuotasException;
+import co.edu.uniremington.mscourses.exception.NoSlotsAvailableException;
 import co.edu.uniremington.mscourses.model.Course;
 import co.edu.uniremington.mscourses.repository.CourseRepository;
 import org.springframework.stereotype.Service;
@@ -13,56 +14,57 @@ public class CourseService {
 
     private final CourseRepository courseRepository;
 
-<span class="fc" id="L16">    public CourseService(CourseRepository courseRepository) {</span>
-<span class="fc" id="L17">        this.courseRepository = courseRepository;</span>
-<span class="fc" id="L18">    }</span>
+<span class="fc" id="L17">    public CourseService(CourseRepository courseRepository) {</span>
+<span class="fc" id="L18">        this.courseRepository = courseRepository;</span>
+<span class="fc" id="L19">    }</span>
 
     public List&lt;Course&gt; findAll() {
-<span class="fc" id="L21">        return courseRepository.findAll();</span>
+<span class="fc" id="L22">        return courseRepository.findAll();</span>
     }
 
     public Course getCourseById(Long id) {
-<span class="fc" id="L25">        return courseRepository.findById(id)</span>
-<span class="fc" id="L26">                .orElseThrow(() -&gt; new CourseNotFoundException(id));</span>
+<span class="fc" id="L26">        return courseRepository.findById(id)</span>
+<span class="fc" id="L27">                .orElseThrow(() -&gt; new CourseNotFoundException(id));</span>
     }
 
-    public Course save(Course course) {
-<span class="fc" id="L30">        return courseRepository.save(course);</span>
+    public Course saveCourse(CourseDto dto) {
+<span class="fc" id="L31">        Course course = new Course(null, dto.getName(), dto.getCredits(), dto.getAvailableQuotas());</span>
+<span class="fc" id="L32">        return courseRepository.save(course);</span>
     }
 
     public Course update(Long id, Course courseDetails) {
-<span class="fc" id="L34">        return courseRepository.findById(id).map(existingCourse -&gt; {</span>
-<span class="fc" id="L35">            existingCourse.setName(courseDetails.getName());</span>
-<span class="fc" id="L36">            existingCourse.setCredits(courseDetails.getCredits());</span>
-<span class="fc" id="L37">            return courseRepository.save(existingCourse);</span>
-<span class="fc" id="L38">        }).orElseThrow(() -&gt; new CourseNotFoundException(id));</span>
+<span class="fc" id="L36">        return courseRepository.findById(id).map(existingCourse -&gt; {</span>
+<span class="fc" id="L37">            existingCourse.setName(courseDetails.getName());</span>
+<span class="fc" id="L38">            existingCourse.setCredits(courseDetails.getCredits());</span>
+<span class="fc" id="L39">            return courseRepository.save(existingCourse);</span>
+<span class="fc" id="L40">        }).orElseThrow(() -&gt; new CourseNotFoundException(id));</span>
     }
 
-    public void delete(Long id) {
-<span class="fc bfc" id="L42" title="All 2 branches covered.">        if (!courseRepository.existsById(id)) {</span>
-<span class="fc" id="L43">            throw new CourseNotFoundException(id);</span>
+    public void deleteCourse(Long id) {
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        if (!courseRepository.existsById(id)) {</span>
+<span class="fc" id="L45">            throw new CourseNotFoundException(id);</span>
         }
-<span class="fc" id="L45">        courseRepository.deleteById(id);</span>
-<span class="fc" id="L46">    }</span>
+<span class="fc" id="L47">        courseRepository.deleteById(id);</span>
+<span class="fc" id="L48">    }</span>
 
-    public void decreaseQuota(Long id) {
-<span class="fc" id="L49">        Course course = courseRepository.findById(id)</span>
-<span class="fc" id="L50">                .orElseThrow(() -&gt; new CourseNotFoundException(id));</span>
+    public void reserveSlot(Long courseId) {
+<span class="fc" id="L51">        Course course = courseRepository.findById(courseId)</span>
+<span class="fc" id="L52">                .orElseThrow(() -&gt; new CourseNotFoundException(courseId));</span>
 
-<span class="fc bfc" id="L52" title="All 2 branches covered.">        if (course.getAvailableQuotas() &lt;= 0) {</span>
-<span class="fc" id="L53">            throw new NoAvailableQuotasException(id);</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        if (course.getAvailableQuotas() &lt;= 0) {</span>
+<span class="fc" id="L55">            throw new NoSlotsAvailableException(courseId);</span>
         }
 
-<span class="fc" id="L56">        course.setAvailableQuotas(course.getAvailableQuotas() - 1);</span>
-<span class="fc" id="L57">        courseRepository.save(course);</span>
-<span class="fc" id="L58">    }</span>
+<span class="fc" id="L58">        course.setAvailableQuotas(course.getAvailableQuotas() - 1);</span>
+<span class="fc" id="L59">        courseRepository.save(course);</span>
+<span class="fc" id="L60">    }</span>
 
-    public void increaseQuota(Long id) {
-<span class="fc" id="L61">        Course course = courseRepository.findById(id)</span>
-<span class="fc" id="L62">                .orElseThrow(() -&gt; new CourseNotFoundException(id));</span>
+    public void releaseSlot(Long courseId) {
+<span class="fc" id="L63">        Course course = courseRepository.findById(courseId)</span>
+<span class="fc" id="L64">                .orElseThrow(() -&gt; new CourseNotFoundException(courseId));</span>
 
-<span class="fc" id="L64">        course.setAvailableQuotas(course.getAvailableQuotas() + 1);</span>
-<span class="fc" id="L65">        courseRepository.save(course);</span>
-<span class="fc" id="L66">    }</span>
+<span class="fc" id="L66">        course.setAvailableQuotas(course.getAvailableQuotas() + 1);</span>
+<span class="fc" id="L67">        courseRepository.save(course);</span>
+<span class="fc" id="L68">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

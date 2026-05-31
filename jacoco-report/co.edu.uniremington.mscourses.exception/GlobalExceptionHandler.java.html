@@ -16,8 +16,8 @@ import java.util.Map;
 <span class="fc" id="L16">                .body(Map.of(&quot;error&quot;, ex.getMessage()));</span>
     }
 
-    @ExceptionHandler(NoAvailableQuotasException.class)
-    public ResponseEntity&lt;Map&lt;String, String&gt;&gt; handleNoQuotas(NoAvailableQuotasException ex) {
+    @ExceptionHandler(NoSlotsAvailableException.class)
+    public ResponseEntity&lt;Map&lt;String, String&gt;&gt; handleNoSlots(NoSlotsAvailableException ex) {
 <span class="fc" id="L21">        return ResponseEntity.status(HttpStatus.CONFLICT)</span>
 <span class="fc" id="L22">                .body(Map.of(&quot;error&quot;, ex.getMessage()));</span>
     }

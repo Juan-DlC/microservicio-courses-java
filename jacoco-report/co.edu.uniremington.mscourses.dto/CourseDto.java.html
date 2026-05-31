@@ -3,29 +3,21 @@
 public class CourseDto {
     private String name;
     private int credits;
+    private int availableQuotas;
 
-<span class="nc" id="L7">    public CourseDto() {</span>
-<span class="nc" id="L8">    }</span>
+<span class="nc" id="L8">    public CourseDto() {}</span>
 
-<span class="nc" id="L10">    public CourseDto(String name, int credits) {</span>
-<span class="nc" id="L11">        this.name = name;</span>
-<span class="nc" id="L12">        this.credits = credits;</span>
-<span class="nc" id="L13">    }</span>
+<span class="fc" id="L10">    public CourseDto(String name, int credits, int availableQuotas) {</span>
+<span class="fc" id="L11">        this.name = name;</span>
+<span class="fc" id="L12">        this.credits = credits;</span>
+<span class="fc" id="L13">        this.availableQuotas = availableQuotas;</span>
+<span class="fc" id="L14">    }</span>
 
-    public String getName() {
-<span class="nc" id="L16">        return name;</span>
-    }
-
-    public void setName(String name) {
-<span class="nc" id="L20">        this.name = name;</span>
-<span class="nc" id="L21">    }</span>
-
-    public int getCredits() {
-<span class="nc" id="L24">        return credits;</span>
-    }
-
-    public void setCredits(int credits) {
-<span class="nc" id="L28">        this.credits = credits;</span>
-<span class="nc" id="L29">    }</span>
+<span class="fc" id="L16">    public String getName() { return name; }</span>
+<span class="nc" id="L17">    public void setName(String name) { this.name = name; }</span>
+<span class="fc" id="L18">    public int getCredits() { return credits; }</span>
+<span class="nc" id="L19">    public void setCredits(int credits) { this.credits = credits; }</span>
+<span class="fc" id="L20">    public int getAvailableQuotas() { return availableQuotas; }</span>
+<span class="nc" id="L21">    public void setAvailableQuotas(int availableQuotas) { this.availableQuotas = availableQuotas; }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

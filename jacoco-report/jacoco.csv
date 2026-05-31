@@ -4,6 +4,7 @@ ms-courses,co.edu.uniremington.mscourses,MsCoursesApplication,5,3,0,0,2,1,1,1,1,
 ms-courses,co.edu.uniremington.mscourses.model,Course,4,42,0,0,2,18,1,9,1,9
 ms-courses,co.edu.uniremington.mscourses.exception,GlobalExceptionHandler,0,19,0,0,0,5,0,3,0,3
 ms-courses,co.edu.uniremington.mscourses.exception,NoAvailableQuotasException,0,5,0,0,0,2,0,1,0,1
+ms-courses,co.edu.uniremington.mscourses.exception,NoSlotsAvailableException,0,5,0,0,0,2,0,1,0,1
 ms-courses,co.edu.uniremington.mscourses.exception,CourseNotFoundException,0,5,0,0,0,2,0,1,0,1
-ms-courses,co.edu.uniremington.mscourses.service,CourseService,0,137,0,4,0,28,0,15,0,13
-ms-courses,co.edu.uniremington.mscourses.dto,CourseDto,26,0,0,0,12,0,6,0,6,0
+ms-courses,co.edu.uniremington.mscourses.service,CourseService,0,148,0,4,0,29,0,15,0,13
+ms-courses,co.edu.uniremington.mscourses.dto,CourseDto,15,21,0,0,4,8,4,4,4,4
