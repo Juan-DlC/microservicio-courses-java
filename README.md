@@ -31,8 +31,8 @@ http://localhost:8081/swagger-ui/index.html
 | POST | `/api/courses` | Crear curso | 200 |
 | PUT | `/api/courses/{id}` | Actualizar curso | 200 / 404 |
 | DELETE | `/api/courses/{id}` | Eliminar curso | 200 / 404 |
-| PUT | `/api/courses/{id}/decrease-quota` | Reservar un cupo (usado por ms-students) | 200 / 404 / 409 |
-| PUT | `/api/courses/{id}/increase-quota` | Liberar un cupo (usado por ms-students) | 200 / 404 |
+| PUT | `/api/courses/{id}/reserve-slot` | Reservar un cupo (usado por ms-students) | 200 / 404 / 409 |
+| PUT | `/api/courses/{id}/release-slot` | Liberar un cupo (usado por ms-students) | 200 / 404 |
 
 ## Modelo
 
@@ -50,7 +50,7 @@ http://localhost:8081/swagger-ui/index.html
 | Excepción | Código HTTP | Descripción |
 |---|---|---|
 | `CourseNotFoundException` | 404 | El curso no existe |
-| `NoAvailableQuotasException` | 409 | El curso no tiene cupos disponibles |
+| `NoSlotsAvailableException` | 409 | El curso no tiene cupos disponibles |
 
 ## Pruebas
 
@@ -58,7 +58,7 @@ http://localhost:8081/swagger-ui/index.html
 mvn verify
 ```
 
-Ejecuta pruebas unitarias (JUnit 5 + Mockito) y valida cobertura Jacoco ≥ 80%.
+Ejecuta pruebas unitarias (JUnit 6 + Mockito 5.20) y valida cobertura Jacoco ≥ 80%.
 
 - `CourseServiceTest` — lógica de negocio pura, sin contexto Spring
 - `CourseControllerTest` — endpoints con MockMvc standalone
