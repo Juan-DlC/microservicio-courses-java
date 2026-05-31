@@ -21,6 +21,11 @@ public class CourseService {
         return courseRepository.findAll();
     }
 
+    public Course getCourseById(Long id) {
+        return courseRepository.findById(id)
+                .orElseThrow(() -> new CourseNotFoundException(id));
+    }
+
     public Course save(Course course) {
         return courseRepository.save(course);
     }

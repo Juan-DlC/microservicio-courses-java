@@ -42,6 +42,29 @@ class CourseServiceTest {
         verify(courseRepository, times(1)).findAll();
     }
 
+    // ── getCourseById ────────────────────────────────────────────────────────
+
+    @Test
+    void getCourseById_WhenCourseExists_ShouldReturnCourse() {
+        Course course = new Course(1L, "Cálculo", 4, 30);
+        when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
+
+        Course result = courseService.getCourseById(1L);
+
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
+        assertEquals("Cálculo", result.getName());
+        verify(courseRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void getCourseById_WhenCourseNotFound_ShouldThrowCourseNotFoundException() {
+        when(courseRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(CourseNotFoundException.class,
+                () -> courseService.getCourseById(99L));
+    }
+
     // ── save ─────────────────────────────────────────────────────────────────
 
     @Test

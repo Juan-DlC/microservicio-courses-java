@@ -59,6 +59,28 @@ class CourseControllerTest {
                 .andExpect(jsonPath("$[0].name").value("Cálculo"));
     }
 
+    // ── GET /api/courses/{id} ─────────────────────────────────────────────────
+
+    @Test
+    void getCourseById_WhenCourseExists_ShouldReturn200() throws Exception {
+        when(courseService.getCourseById(1L)).thenReturn(
+                new Course(1L, "Cálculo", 4, 30));
+
+        mockMvc.perform(get("/api/courses/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Cálculo"));
+    }
+
+    @Test
+    void getCourseById_WhenCourseNotFound_ShouldReturn404() throws Exception {
+        when(courseService.getCourseById(99L))
+                .thenThrow(new CourseNotFoundException(99L));
+
+        mockMvc.perform(get("/api/courses/99"))
+                .andExpect(status().isNotFound());
+    }
+
     // ── POST /api/courses ─────────────────────────────────────────────────────
 
     @Test

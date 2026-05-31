@@ -28,6 +28,11 @@ public class CourseController {
         return courseService.findAll();
     }
 
+    @GetMapping("/{id}")
+    public Course getCourseById(@PathVariable Long id) {
+        return courseService.getCourseById(id);
+    }
+
     @PostMapping
     public Course create(@RequestBody Course course) {
         return courseService.save(course);
