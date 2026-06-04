@@ -5,6 +5,8 @@ import co.edu.uniremington.mscourses.model.Course;
 import co.edu.uniremington.mscourses.service.CourseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,8 +43,8 @@ public class CourseController {
 
     @Operation(summary = "Create a course", description = "Registers a new course with name, credits and available quotas")
     @PostMapping
-    public Course create(@RequestBody CourseDto dto) {
-        return courseService.saveCourse(dto);
+    public ResponseEntity<Course> create(@RequestBody CourseDto dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(courseService.saveCourse(dto));
     }
 
     @Operation(summary = "Update a course", description = "Updates the data of an existing course")

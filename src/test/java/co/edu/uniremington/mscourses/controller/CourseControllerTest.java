@@ -85,7 +85,7 @@ class CourseControllerTest {
     // ── POST /api/courses ─────────────────────────────────────────────────────
 
     @Test
-    void create_ShouldReturn200WithCreatedCourse() throws Exception {
+    void create_ShouldReturn201WithCreatedCourse() throws Exception {
         CourseDto dto   = new CourseDto("Física", 3, 20);
         Course created  = new Course(1L, "Física", 3, 20);
         when(courseService.saveCourse(any(CourseDto.class))).thenReturn(created);
@@ -93,7 +93,7 @@ class CourseControllerTest {
         mockMvc.perform(post("/api/courses")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Física"));
     }
 
